@@ -5025,18 +5025,18 @@
 	},
 
 	"Tunisia": {
-		"Tunisia VAT 18%": {
-			"account_name": "VAT 18%",
-			"tax_rate": 18.00,
+		"Tunisia VAT 19%": {
+			"account_name": "VAT 19%",
+			"tax_rate": 19.00,
 			"default": 1
 		},
-		"Tunisia VAT 12%": {
-			"account_name": "VAT 12%",
-			"tax_rate": 12.00
+		"Tunisia VAT 13%": {
+			"account_name": "VAT 13%",
+			"tax_rate": 13.00
 		},
-		"Tunisia VAT 6%": {
-			"account_name": "VAT 6%",
-			"tax_rate": 6.00
+		"Tunisia VAT 7%": {
+			"account_name": "VAT 7%",
+			"tax_rate": 7.00
 		}
 	},
 

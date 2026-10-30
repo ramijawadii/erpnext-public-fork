@@ -119,11 +119,7 @@ def get_chart(chart_template, existing_company=None):
 
 		return standard_chart_of_accounts_with_account_number.get()
 	else:
-		folders = ("verified",)
-		if frappe.local.flags.allow_unverified_charts:
-			folders = ("verified", "unverified")
-		for folder in folders:
-			path = os.path.join(os.path.dirname(__file__), folder)
+		for path in get_chart_folders():
 			for fname in os.listdir(path):
 				fname = frappe.as_unicode(fname)
 				if fname.endswith(".json"):
@@ -131,6 +127,24 @@ def get_chart(chart_template, existing_company=None):
 						chart = f.read()
 						if chart and json.loads(chart).get("name") == chart_template:
 							return json.loads(chart).get("tree")
+
+
+def get_chart_folders():
+	"""Folders searched for chart of accounts JSON files.
+
+	Apps can ship charts through the `chart_of_accounts_folders` hook, a list of paths relative to the
+	app's package directory, e.g. `chart_of_accounts_folders = ["charts"]` in `my_app/hooks.py`.
+	"""
+	folders = ["verified"]
+	if frappe.local.flags.allow_unverified_charts:
+		folders.append("unverified")
+	paths = [os.path.join(os.path.dirname(__file__), folder) for folder in folders]
+
+	for app in frappe.get_installed_apps():
+		for folder in frappe.get_hooks("chart_of_accounts_folders", app_name=app):
+			paths.append(frappe.get_app_path(app, folder))
+
+	return [path for path in paths if os.path.isdir(path)]
 
 
 @frappe.whitelist()
@@ -147,15 +161,7 @@ def get_charts_for_country(country, with_standard=False):
 
 	country_code = frappe.get_cached_value("Country", country, "code")
 	if country_code:
-		folders = ("verified",)
-		if frappe.local.flags.allow_unverified_charts:
-			folders = ("verified", "unverified")
-
-		for folder in folders:
-			path = os.path.join(os.path.dirname(__file__), folder)
-			if not os.path.exists(path):
-				continue
-
+		for path in get_chart_folders():
 			for fname in os.listdir(path):
 				fname = frappe.as_unicode(fname)
 				if (fname.startswith(country_code) or fname.startswith(country)) and fname.endswith(".json"):
